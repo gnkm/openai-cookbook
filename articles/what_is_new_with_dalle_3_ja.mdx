@@ -1,0 +1,203 @@
+# DALL·E-3 の新機能
+
+DALL·E-3 は、DALL-E テキストから画像への生成モデルの最新バージョンです。テキストから画像への生成における現在の最先端技術として、DALL·E は幅広いドメインにわたって高品質の画像を生成できます。DALL·E-3 がどのように構築されたかの技術的な詳細に興味がある場合は、[研究論文](https://cdn.openai.com/papers/dall-e-3.pdf)で詳しく読むことができます。この記事では、DALL·E-3 のいくつかの新機能と能力、および API で構築できる新しい製品の例について説明します。
+
+念のため、Image generation API は変更されておらず、DALL·E-2 と同じエンドポイントとフォーマットを維持しています。Image API の使用方法に関するガイドをお探しの場合は、[Cookbook の記事](https://cookbook.openai.com/examples/dalle/image_generations_edits_and_variations_with_dall-e)をご覧ください。
+
+現在 DALL·E-3 で使用できる唯一の API エンドポイントは **Generations**（/v1/images/generations）です。バリエーションやインペインティングはまだサポートしていませんが、Edits と Variations エンドポイントは DALL·E-2 で使用できます。
+
+## Generations
+
+generation API エンドポイントは、テキストプロンプトに基づいて画像を作成します。モデルで作成できるものを強化するために追加したいくつかの新しいパラメータがあります。オプションの簡単な概要は次のとおりです：
+
+### 新しいパラメータ：
+
+- **model**（'dall-e-2' または 'dall-e-3'）：生成に使用するモデルです。空の場合は 'dall-e-2' にデフォルト設定されるため、'dall-e-3' に設定するように注意してください。
+- **style**（'natural' または 'vivid'）：生成される画像のスタイルです。vivid または natural のいずれかである必要があります。Vivid は、モデルがハイパーリアルでドラマチックな画像の生成に傾くようにします。Natural は、モデルがより自然で、ハイパーリアルに見えない画像を生成するようにします。デフォルトは 'vivid' です。
+- **quality**（'standard' または 'hd'）：生成される画像の品質です。'hd' は、より細かい詳細と画像全体でのより大きな一貫性を持つ画像を作成します。デフォルトは 'standard' です。
+
+### その他のパラメータ：
+
+- **prompt**（str）：目的の画像のテキスト説明。最大長は1000文字です。必須フィールド。
+- **n**（int）：生成する画像の数。1から10の間である必要があります。デフォルトは1です。dall-e-3 の場合、n=1 のみがサポートされています。
+- **size**（...）：生成される画像のサイズ。DALL·E-2 モデルの場合、256x256、512x512、または 1024x1024 のいずれかである必要があります。DALL·E-3 モデルの場合、1024x1024、1792x1024、または 1024x1792 のいずれかである必要があります。
+- **response_format**（'url' または 'b64_json'）：生成された画像が返される形式。"url" または "b64_json" のいずれかである必要があります。デフォルトは "url" です。
+- **user**（str）：エンドユーザーを表す一意の識別子。OpenAI が悪用を監視および検出するのに役立ちます。詳細はこちら。
+
+## 新機能
+
+DALL·E-3 のリリースには、必要な画像を生成するのに役立つ多くの新機能と能力が付属しています。新機能の簡単な概要は次のとおりです：
+
+### プロンプトの書き換え
+
+最新の DALL·E-3 API の新機能は、プロンプトの書き換えです。ここでは、GPT-4 を使用して、DALL-E に渡される前にすべてのプロンプトを最適化します。私たちの研究では、非常に詳細なプロンプトを使用すると、大幅に優れた結果が得られることがわかっています。キャプション、プロンプティング、安全性の軽減策の詳細については、[DALL·E-3 研究論文](https://cdn.openai.com/papers/dall-e-3.pdf)で詳しく読むことができます。
+
+_この機能は現時点では無効にできないことに注意してください。ただし、以下の例で示すように、プロンプトでリラベラーに指示を与えるだけで、高いレベルの忠実度を達成できます。_
+
+![プロンプトの書き換え](/images/dalle_3/dalle_3_improved_prompts.png)
+
+### Standard vs HD 品質
+
+DALL·E-3 は、すべての生成で詳細と組織のレベルを調整できる新しい 'quality' パラメータを導入します。'standard' 品質の生成は、あなたが慣れ親しんでいる DALL·E-3 で、'hd' 生成は、プロンプトへの詳細と準拠の新しいレベルをもたらします。生成品質を 'hd' に設定すると、画像あたりのコストが増加し、生成にかかる時間が約10秒程度増加することが多いことに注意してください。
+
+たとえば、ここでは 'hd' と 'standard' 品質の2つの異なるアイコンがあります。多くの場合、どちらの品質を選択するかは好みの問題ですが、タスクがより多くの詳細とテクスチャをキャプチャする能力、またはシーンのより良い構成を必要とする場合、'hd' がしばしば勝ちます。
+
+![アイコン](/images/dalle_3/icons.jpg)
+
+別の例を示します。今回は 'An infinite, uniform grid of tessellated cubes.' というプロンプトで、DALL·E は都合よく _"An infinite, uniform grid of tessellated cubes painted carefully in an isometric perspective. The cubes are meticulously arranged in such a way that they seem to stretch endlessly into the distance. Each cube is identical to the next, with light reflecting consistently across all surfaces, underscoring their uniformity. This is a digitally rendered image."_ と書き換えます：
+
+![キューブ](/images/dalle_3/cubes.jpg)
+
+### 新しいサイズ
+
+DALL·E-3 は、1024px × 1024px、1792px × 1024px、1024px × 1792px の3つの異なる画像サイズを受け入れます。アスペクト比の柔軟性を提供するだけでなく、これらのサイズは生成された画像のスタイルとコンテキストに大きな影響を与える可能性があります。たとえば、携帯電話のカメラで撮影されたように見える画像を探している場合は縦型の画像がより良く機能する可能性があり、風景画やデジタルデザインには横型の画像がより良く機能する可能性があります。
+
+この違いを示すために、異なるアスペクト比で同じ入力プロンプトの複数のバリエーションを示します。この場合、私のプロンプトは次のとおりでした：「Professional photoshoot of a Chemex brewer in the process of brewing coffee.」（参考までに、これは[実際の Chemex ブリュワー](https://m.media-amazon.com/images/I/61lrld81vxL.jpg)の写真です）。
+
+正方形の形式での生成は次のとおりです（HD と standard 品質の両方）：
+
+![square_coffee](/images/dalle_3/square_coffee.jpg)
+
+これらの画像がアイテムに近くフレーミングされ、近くにさまざまな周囲のアイテムがあるより閉じたスペースで撮影されたように見えることがわかります。
+
+同じプロンプトでより広いアスペクト比での結果は次のとおりです：
+
+![wide_coffee](/images/dalle_3/wide_coffee.jpg)
+
+以前の生成と比較して、これらはクローズアップの形式で提供されます。背景はぼやけており、アイテム自体により焦点が当てられており、クイックスナップではなく、プロフェッショナルに組織された写真撮影のようです。
+
+最後に、縦型のアスペクト比があります：
+
+![tall_coffee](/images/dalle_3/tall_coffee.jpg)
+
+これらは、よりカジュアルな外観で、携帯電話の画像に似ています。より多くのアクションが含まれています：ゆっくりと滴るコーヒーまたはポットからのアクティブな注ぎ。
+
+### 新しいスタイル
+
+DALL·E-3 は、natural と vivid の2つの新しいスタイルを導入します。natural スタイルは、その「より穏やかな」リアリズムで DALL·E-2 スタイルにより似ていますが、vivid スタイルは、ハイパーリアルでシネマティックな画像の生成に傾く新しいスタイルです。参考までに、ChatGPT のすべての DALL·E 生成は 'vivid' スタイルで生成されます。
+
+natural スタイルは、DALL·E-3 がより単純で、控えめで、またはリアリスティックであるはずの対象を誇張または混乱させる場合に特に役立ちます。ロゴ生成、ストック写真、または実世界のオブジェクトに一致させようとしている他のケースでよく使用しています。
+
+上記と同じプロンプトの vivid スタイルの例を次に示します。vivid ははるかにシネマティックで（素晴らしく見えます）が、それを探していない場合は目立ちすぎる可能性があります。
+
+![vivid_coffee](/images/dalle_3/vivid_coffee.jpg)
+
+Thomas Cole の 'Desolation' のスタイルでの絵画のこの例のように、natural スタイルを好む多くのケースがあります：
+
+![thomas_cole](/images/dalle_3/thomas_cole.jpg)
+
+## 例とプロンプト
+
+DALL·E-3 を使用した構築を開始するのに役立つように、API で構築できる製品のいくつかの例を考え、現時点で DALL·E-3 に固有と思われるいくつかのスタイルと能力を収集しました。また、DALL·E-3 に生成を促すのに苦労している対象をいくつかリストアップしました。試してみたい場合に備えて。
+
+### アイコン生成
+
+ウェブサイトやアプリに最適なアイコンを見つけるのに苦労したことはありますか？アイコンのスタイル、サイズ、対象を選択でき、DALL·E 生成からカスタム SVG を生成するカスタムアイコンジェネレーターアプリがあれば素晴らしいでしょう。DALL·E-3 で生成した役立つウェブサイトアイコンの例を次に示します：
+
+![icon_set](/images/dalle_3/icon_set.jpg)
+
+この場合、Potrace を使用して画像を SVG に変換しました。[ここ](https://potrace.sourceforge.net/)からダウンロードできます。画像を変換するために使用したのは次のとおりです：
+
+```bash
+potrace -s cat.jpg -o cat.svg
+```
+
+SVG に変換する前に、画像の明るさとコントラストを上げる必要がある場合があります。次のコマンドを使用しました：
+
+```bash
+convert cat.jpg -brightness-contrast 50x50 cat.jpg
+```
+
+### ロゴ生成
+
+DALL·E-3 は、会社や製品のロゴ作成プロセスを開始するのに最適です。DALL·E に 'Vector logo design of a Greek statue, minimalistic, with a white background' を作成するようにプロンプトすることで、次のことを達成しました：
+
+![logo_greece](/images/dalle_3/logo_greece.jpg)
+
+今回はアラビアのコーヒーショップ用に作成した別のロゴです：
+
+![logo_arabia](/images/dalle_3/logo_arabia.jpg)
+
+既存のロゴを反復する場合、OpenAI のロゴを取り、GPT-4V にそれを説明するように依頼し、次に DALL·E にロゴのバリエーションを生成するように依頼しました：
+
+![iteration](/images/dalle_3/iteration.jpg)
+
+### カスタムタトゥー
+
+DALL·E-3 は線画の生成に優れており、カスタムタトゥーの生成に役立つ可能性があります。DALL·E-3 で生成した線画の例を次に示します：
+
+![tattoos](/images/dalle_3/tattoos.jpg)
+
+### ダイカットステッカーと T シャツ
+
+DALL·E-3 でカスタムダイカットステッカーと T シャツを生成し、Printful や Stickermule などのプリントオンデマンドサービスと統合できたらどうでしょうか？デザイン経験がなくても、数分でカスタムステッカーや T シャツを手に入れることができます。DALL·E-3 で生成したステッカーの例を次に示します：
+
+![stickers](/images/dalle_3/stickers.jpg)
+
+### Minecraft スキン
+
+いくつかの困難を伴いましたが、DALL·E-3 に Minecraft スキンを生成するようにプロンプトすることができました。巧妙なプロンプティングで、DALL·E-3 に信頼性の高い素晴らしい Minecraft スキンを生成させることができると確信しています。DALL·E がゲーム自体からコンテンツを生成しようとしていると考える可能性があるため、'Minecraft' という言葉を使用するのは難しいかもしれません。代わりに、アイデアを別の方法で伝えることができます：「Flat player skin texture of a ninja skin, compatible with Minecraftskins.com or Planet Minecraft.」
+
+私が作成できたものは次のとおりです。いくつかの作業が必要かもしれませんが、良いスタートだと思います：
+
+![minecraft](/images/dalle_3/minecraft.jpg)
+
+### その他多数...
+
+まだ試す時間がなかったアイデアをいくつか紹介します：
+
+- カスタム絵文字または Twitch エモート？
+- ベクターイラスト？
+- パーソナライズされた Bitmoji スタイルのアバター？
+- アルバムアート？
+- カスタムグリーティングカード？
+- DALL·E とのポスター/フライヤー「ペアプログラミング」？
+
+## ショーケース
+
+DALL·E-3 が何ができるかを理解し始めたばかりです。これまでに見た最高のスタイル、生成、プロンプトのいくつかを次に示します。これらの画像の一部の元の著者を見つけることができなかったので、誰が作成したかを知っている場合は、お知らせください！
+
+![collage](/images/dalle_3/collage.jpg)
+
+出典：
+
+[@scharan79 on Reddit](https://www.reddit.com/r/dalle2/comments/170ce1r/dalle_3_is_pretty_good_at_drawing/)  
+[@TalentedJuli on Reddit](https://www.reddit.com/r/dalle2/comments/1712x7a/60s_pulp_magazine_illustration_is_the_best_style/)  
+[@Wild-Culture-5068 on Reddit](https://www.reddit.com/r/dalle2/comments/17dwp0s/soviet_blade_runner/)  
+[@popsicle_pope on Reddit](https://www.reddit.com/r/dalle2/comments/170lx1z/%F0%9D%94%AA%F0%9D%94%A2%F0%9D%94%B1%F0%9D%94%9E%F0%9D%94%AA%F0%9D%94%AC%F0%9D%94%AF%F0%9D%94%AD%F0%9D%94%A5%F0%9D%94%AC%F0%9D%94%B0%F0%9D%94%A6%F0%9D%94%B0/)  
+[@gopatrik on Twitter](https://twitter.com/gopatrik/status/1717579802205626619)  
+[@ARTiV3RSE on Twitter](https://twitter.com/ARTiV3RSE/status/1720202013638599040)  
+[@willdepue on Twitter](https://twitter.com/willdepue/status/1705677997150445941)  
+Various OpenAI employees
+
+## 課題
+
+DALL·E-3 はまだ非常に新しく、苦労していることがたくさんあります（または、正しくプロンプトする方法をまだ理解していないだけかもしれません）。試してみたい課題をいくつか紹介します：
+
+### Web デザイン
+
+DALL·E は、実際のようなウェブサイト、アプリなどを生成するのに本当に苦労しており、Web デザイナーのポートフォリオページのように見えるものを生成することがよくあります。これまでに得た最高のものは次のとおりです：
+
+![websites](/images/dalle_3/websites.jpg)
+
+### シームレステクスチャ
+
+DALL·E-3 がシームレステクスチャを生成できるようになるのは非常に近いように感じます。多くの場合、それらは素晴らしく見えますが、わずかにカットオフされているか、いくつかのアーティファクトがあります。以下の例を参照してください：
+
+![seamless](/images/dalle_3/seamless.jpg)
+
+### フォント
+
+DALL·E を使用してカスタムフォントを生成したり、文字デザインを反復したりすることは本当にクールかもしれませんが、まだうまくいきませんでした。これまでに得た最高のものは次のとおりです：
+
+![fonts](/images/dalle_3/fonts.jpg)
+
+## その他のリソース
+
+お読みいただきありがとうございます！DALL·E-3 に関するその他のリソースをお探しの場合は、関連リンクをいくつか紹介します：
+
+- [DALL·E-3 ブログ投稿](https://openai.com/dall-e-3)
+- [DALL·E-3 研究論文](https://cdn.openai.com/papers/dall-e-3.pdf)
+- [Image API ドキュメント](https://platform.openai.com/docs/api-reference/images)
+- [Image API Cookbook](https://cookbook.openai.com/examples/dalle/image_generations_edits_and_variations_with_dall-e)
+
