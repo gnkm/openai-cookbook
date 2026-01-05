@@ -1,70 +1,70 @@
-# LM Studio で gpt-oss をローカルで実行する方法
+# LM Studioを使ってgpt-ossをローカルで実行する方法
 
-[LM Studio](https://lmstudio.ai) は、ローカルハードウェアで大規模言語モデル（LLM）を実行するための高性能でフレンドリーなデスクトップアプリケーションです。このガイドでは、LM Studio を使用して **gpt-oss-20b** または **gpt-oss-120b** モデルをセットアップして実行する方法、チャットする方法、MCP サーバーを使用する方法、または LM Studio のローカル開発 API を通じてモデルと対話する方法を説明します。
+[LM Studio](https://lmstudio.ai)は、ローカルハードウェア上で大規模言語モデル（LLM）を実行するための高性能でユーザーフレンドリーなデスクトップアプリケーションです。このガイドでは、LM Studioを使用して**gpt-oss-20b**または**gpt-oss-120b**モデルをセットアップして実行する方法を説明します。これには、モデルとのチャット、MCPサーバーの使用、またはLM Studioのローカル開発API経由でのモデルとの対話が含まれます。
 
-このガイドは、PC や Mac で gpt-oss を実行するようなコンシューマーハードウェアを対象としていることに注意してください。NVIDIA の H100 のような専用 GPU を使用するサーバーアプリケーションの場合は、[vLLM ガイドをご覧ください](https://cookbook.openai.com/articles/gpt-oss/run-vllm)。
+このガイドは、PCやMacでgpt-ossを実行するなど、コンシューマーハードウェア向けであることにご注意ください。NVIDIAのH100などの専用GPUを搭載したサーバーアプリケーションについては、[vLLMガイドをご確認ください](https://cookbook.openai.com/articles/gpt-oss/run-vllm)。
 
 ## モデルを選択する
 
-LM Studio は gpt-oss の両方のモデルサイズをサポートしています：
+LM Studioは、gpt-ossの両方のモデルサイズをサポートしています：
 
 - [**`openai/gpt-oss-20b`**](https://lmstudio.ai/models/openai/gpt-oss-20b)
   - 小さいモデル
-  - 最低 **16GB の VRAM** のみが必要
-  - ハイエンドのコンシューマー GPU または Apple Silicon Mac に最適
+  - 最低**16GBのVRAM**のみが必要
+  - ハイエンドコンシューマーGPUやApple Silicon Macに最適
 - [**`openai/gpt-oss-120b`**](https://lmstudio.ai/models/openai/gpt-oss-120b)
-  - より大きなフルサイズのモデル
-  - **≥60GB VRAM** が最適
-  - マルチ GPU または強力なワークステーションセットアップに最適
+  - より大きなフルサイズモデル
+  - **≥60GB VRAM**が最適
+  - マルチGPUまたは高性能ワークステーション設定に理想的
 
-LM Studio は、[llama.cpp](https://github.com/ggml-org/llama.cpp) 推論エンジン（GGUF フォーマットのモデルを実行）と、Apple Silicon Mac 用の [Apple MLX](https://github.com/ml-explore/mlx) エンジンの両方を搭載しています。
+LM Studioには、[llama.cpp](https://github.com/ggml-org/llama.cpp)推論エンジン（GGUF形式のモデルを実行）と、Apple Silicon Mac用の[Apple MLX](https://github.com/ml-explore/mlx)エンジンの両方が搭載されています。
 
 ## クイックセットアップ
 
-1. **LM Studio をインストール**
-   LM Studio は Windows、macOS、Linux で利用できます。[こちらから入手](https://lmstudio.ai/download)。
+1. **LM Studioをインストール**
+   LM StudioはWindows、macOS、Linuxで利用できます。[こちらから入手してください](https://lmstudio.ai/download)。
 
-2. **gpt-oss モデルをダウンロード** → 
+2. **gpt-ossモデルをダウンロード** → 
 
 ```shell
-# 20B の場合
+# 20B用
 lms get openai/gpt-oss-20b
-# または 120B の場合
+# または120B用
 lms get openai/gpt-oss-120b
 ``` 
 
-3. **LM Studio でモデルをロード** 
-  → LM Studio を開き、モデルローディングインターフェースを使用して、ダウンロードした gpt-oss モデルをロードします。または、コマンドラインを使用できます：
+3. **LM Studioでモデルを読み込み** 
+  → LM Studioを開き、モデル読み込みインターフェースを使用してダウンロードしたgpt-ossモデルを読み込みます。または、コマンドラインを使用することもできます：
 
 ```shell
-# 20B の場合
+# 20B用
 lms load openai/gpt-oss-20b
-# または 120B の場合
+# または120B用
 lms load openai/gpt-oss-120b
 ```
 
-4. **モデルを使用** → ロードされたら、LM Studio のチャットインターフェースで直接モデルと対話するか、API を通じて対話できます。
+4. **モデルを使用** → 読み込み後、LM Studioのチャットインターフェースで直接モデルと対話するか、API経由で使用できます。
 
-## gpt-oss とチャットする
+## gpt-ossとチャットする
 
-LM Studio のチャットインターフェースを使用して gpt-oss との会話を開始するか、ターミナルで `chat` コマンドを使用します：
+LM Studioのチャットインターフェースを使用してgpt-ossとの会話を開始するか、ターミナルで`chat`コマンドを使用します：
 
 ```shell
 lms chat openai/gpt-oss-20b
 ```
 
-プロンプトフォーマットに関する注意：LM Studio は、llama.cpp と MLX の両方で実行する際に、gpt-oss モデルへの入力を構築するために OpenAI の [Harmony](https://cookbook.openai.com/articles/openai-harmony) ライブラリを利用します。
+プロンプト形式に関する注意：LM Studioは、llama.cppとMLXの両方で実行する際に、gpt-ossモデルへの入力を構築するためにOpenAIの[Harmony](https://cookbook.openai.com/articles/openai-harmony)ライブラリを利用します。
 
-## ローカルの /v1/chat/completions エンドポイントで gpt-oss を使用する
+## ローカル/v1/chat/completionsエンドポイントでgpt-ossを使用する
 
-LM Studio は **Chat Completions 互換 API** を公開しているため、OpenAI SDK を大きく変更することなく使用できます。Python の例を次に示します：
+LM Studioは**Chat Completions互換API**を公開しているため、大きな変更なしにOpenAI SDKを使用できます。以下はPythonの例です：
 
 ```py
 from openai import OpenAI
 
 client = OpenAI(
     base_url="http://localhost:1234/v1",
-    api_key="not-needed"  # LM Studio は API キーを必要としません
+    api_key="not-needed"  # LM StudioはAPIキーを必要としません
 )
 
 result = client.chat.completions.create(
@@ -78,25 +78,25 @@ result = client.chat.completions.create(
 print(result.choices[0].message.content)
 ```
 
-以前に OpenAI SDK を使用したことがある場合、これはすぐに馴染みがあり、ベース URL を変更するだけで既存のコードが機能するはずです。
+OpenAI SDKを以前に使用したことがある場合、これは即座に馴染みやすく感じられ、ベースURLを変更するだけで既存のコードが動作するはずです。
 
-## チャット UI で MCP を使用する方法
+## チャットUIでMCPを使用する方法
 
-LM Studio は [MCP クライアント](https://lmstudio.ai/docs/app/plugins/mcp)であり、MCP サーバーに接続できます。これにより、gpt-oss モデルに外部ツールを提供できます。
+LM Studioは[MCPクライアント](https://lmstudio.ai/docs/app/plugins/mcp)であり、MCPサーバーを接続できます。これにより、gpt-ossモデルに外部ツールを提供できます。
 
-LM Studio の mcp.json ファイルは次の場所にあります：
+LM StudioのmCP.jsonファイルは以下の場所にあります：
 
 ```shell
 ~/.lmstudio/mcp.json
 ```
 
-## Python または TypeScript での gpt-oss を使用したローカルツールの使用
+## PythonまたはTypeScriptでgpt-ossを使ったローカルツール使用
 
-LM Studio の SDK は、[Python](https://github.com/lmstudio-ai/lmstudio-python) と [TypeScript](https://github.com/lmstudio-ai/lmstudio-js) の両方で利用できます。SDK を活用して、gpt-oss でツール呼び出しとローカル関数実行を実装できます。
+LM StudioのSDKは[Python](https://github.com/lmstudio-ai/lmstudio-python)と[TypeScript](https://github.com/lmstudio-ai/lmstudio-js)の両方で利用できます。SDKを活用して、gpt-ossでツール呼び出しとローカル関数実行を実装できます。
 
-これを実現する方法は、`.act()` 呼び出しを介して行われます。これにより、gpt-oss にツールを提供し、タスクを完了するまで、ツールの呼び出しと推論の間を行き来させることができます。
+これを実現する方法は`.act()`呼び出しを通じてであり、gpt-ossにツールを提供し、タスクを完了するまでツール呼び出しと推論を行き来させることができます。
 
-以下の例は、ローカルファイルシステムにファイルを作成できる単一のツールをモデルに提供する方法を示しています。この例を出発点として使用し、より多くのツールで拡張できます。ツール定義に関するドキュメントは、[Python](https://lmstudio.ai/docs/python/agent/tools) と [TypeScript](https://lmstudio.ai/docs/typescript/agent/tools) をご覧ください。
+以下の例は、ローカルファイルシステムにファイルを作成できる単一のツールをモデルに提供する方法を示しています。この例を出発点として使用し、より多くのツールで拡張できます。ツール定義に関するドキュメントは[Python](https://lmstudio.ai/docs/python/agent/tools)と[TypeScript](https://lmstudio.ai/docs/typescript/agent/tools)をご覧ください。
 
 ```shell
 uv pip install lmstudio
@@ -108,10 +108,10 @@ from pathlib import Path
 
 import lmstudio as lms
 
-# モデルによって呼び出すことができる関数を定義し、ツールとしてモデルに提供します。
-# ツールは通常の Python 関数です。何でも構いません。
+# モデルによって呼び出される関数を定義し、ツールとしてモデルに提供する。
+# ツールは通常のPython関数です。何でも構いません。
 def create_file(name: str, content: str):
-    """指定された名前とコンテンツでファイルを作成します。"""
+    """指定された名前と内容でファイルを作成する。"""
     dest_path = Path(name)
     if dest_path.exists():
         return "Error: File already exists."
@@ -122,9 +122,9 @@ def create_file(name: str, content: str):
     return "File created."
 
 def print_fragment(fragment, round_index=0):
-    # .act() はラウンドインデックスを2番目のパラメータとして提供します
-    # デフォルト値を設定すると、コールバックは
-    # .complete() と .respond() とも互換性があります。
+    # .act()は第2パラメータとしてラウンドインデックスを提供
+    # デフォルト値を設定することで、コールバックは
+    # .complete()と.respond()とも互換性がある。
     print(fragment.content, end="", flush=True)
 
 model = lms.llm("openai/gpt-oss-20b")
@@ -150,7 +150,7 @@ while True:
 
 ```
 
-gpt-oss をローカルで利用したい TypeScript 開発者向けに、`lmstudio-js` を使用した同様の例を次に示します：
+gpt-ossをローカルで利用したいTypeScript開発者向けに、`lmstudio-js`を使用した同様の例を以下に示します：
 
 ```shell
 npm install @lmstudio/sdk
@@ -188,7 +188,7 @@ while (true) {
 
   process.stdout.write("Assistant: ");
   await model.act(chat, [createFileTool], {
-    // モデルがメッセージ全体を終了したら、チャットにプッシュ
+    // モデルがメッセージ全体を完了したら、チャットにプッシュ
     onMessage: (message) => chat.append(message),
     onPredictionFragment: ({ content }) => {
       process.stdout.write(content);
@@ -197,4 +197,3 @@ while (true) {
   process.stdout.write("\n");
 }
 ```
-
