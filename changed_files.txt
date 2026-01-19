@@ -1,3 +1,4 @@
-examples/agents_sdk/context_personalization.ipynb
-examples/gpt-5-codex_prompting_guide.ipynb
-examples/gpt-5/prompt_personalities.ipynb
+articles/codex_exec_plans.md
+articles/gpt-oss/build-your-own-fact-checker-cerebras.ipynb
+articles/gpt-oss/run-vllm.md
+examples/gpt-5/gpt-5-1_prompting_guide.ipynb

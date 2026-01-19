@@ -1,6 +1,6 @@
 # vLLMでgpt-ossを実行する方法
 
-[vLLM](https://docs.vllm.ai/en/latest/)は、メモリ使用量と処理速度を最適化することで大規模言語モデル（LLM）を効率的に提供するよう設計された、オープンソースの高スループット推論エンジンです。このガイドでは、vLLMを使用してサーバー上で**gpt-oss-20b**または**gpt-oss-120b**をセットアップし、アプリケーション用のAPIとしてgpt-ossを提供し、さらにAgents SDKに接続する方法について説明します。
+[vLLM](https://docs.vllm.ai/en/latest/)は、メモリ使用量と処理速度を最適化することで大規模言語モデル（LLM）を効率的に提供するよう設計された、オープンソースの高スループット推論エンジンです。このガイドでは、vLLMを使用してサーバー上で**gpt-oss-20b**または**gpt-oss-120b**をセットアップし、アプリケーション向けのAPIとしてgpt-ossを提供し、さらにAgents SDKに接続する方法について説明します。
 
 このガイドは、NVIDIA H100などの専用GPUを搭載したサーバーアプリケーション向けであることにご注意ください。コンシューマー向けGPUでのローカル推論については、[Ollama](https://cookbook.openai.com/articles/gpt-oss/run-locally-ollama)または[LM Studio](https://cookbook.openai.com/articles/gpt-oss/run-locally-lmstudio)のガイドをご確認ください。
 
@@ -10,11 +10,11 @@ vLLMはgpt-ossの両方のモデルサイズをサポートしています：
 
 - [**`openai/gpt-oss-20b`**](https://huggingface.co/openai/gpt-oss-20b)
   - 小さいモデル
-  - 約**16GBのVRAM**のみ必要
+  - 約**16GBのVRAM**のみが必要
 - [**`openai/gpt-oss-120b`**](https://huggingface.co/openai/gpt-oss-120b)
   - より大きなフルサイズモデル
   - **≥60GB VRAM**が最適
-  - 単一のH100またはマルチGPU構成に適合可能
+  - 単一のH100またはマルチGPU構成で動作可能
 
 両方のモデルは**MXFP4量子化**が標準で適用されています。
 
@@ -45,7 +45,7 @@ vllm serve openai/gpt-oss-120b
 
 ## APIを使用する
 
-vLLMは**Chat Completions互換API**と**Responses互換API**を公開しているため、大きな変更なしにOpenAI SDKを使用できます。Pythonの例を以下に示します：
+vLLMは**Chat Completions互換API**と**Responses互換API**を公開しているため、大きな変更なしにOpenAI SDKを使用できます。以下はPythonの例です：
 
 ```py
 from openai import OpenAI
@@ -74,13 +74,13 @@ response = client.responses.create(
 print(response.output_text)
 ```
 
-OpenAI SDKを以前に使用したことがある場合、これは即座に馴染みやすく感じられ、ベースURLを変更するだけで既存のコードが動作するはずです。
+OpenAI SDKを使用したことがある場合、これは即座に馴染みやすく感じられ、ベースURLを変更するだけで既存のコードが動作するはずです。
 
 ## ツールの使用（関数呼び出し）
 
-vLLMは関数呼び出しとモデルにブラウジング機能を提供することをサポートしています。
+vLLMは関数呼び出しと、モデルにブラウジング機能を提供することをサポートしています。
 
-関数呼び出しはResponsesとChat Completions APIの両方で動作します。
+関数呼び出しは、ResponsesとChat Completions両方のAPIで動作します。
 
 Chat Completions経由で関数を呼び出す例：
 
@@ -109,15 +109,15 @@ response = client.chat.completions.create(
 print(response.choices[0].message)
 ```
 
-モデルは思考の連鎖（CoT）の一部としてツール呼び出しを実行できるため、APIから返された推論を、答えを提供するツール呼び出しへの後続の呼び出しに戻し、モデルが最終的な答えに到達するまで続けることが重要です。
+モデルは思考の連鎖（CoT）の一部としてツール呼び出しを実行できるため、APIから返される推論を、答えを提供するツール呼び出しへの後続の呼び出しに戻し、モデルが最終的な答えに到達するまで続けることが重要です。
 
 ## Agents SDK統合
 
 OpenAIの**Agents SDK**でgpt-ossを使用したいですか？
 
-Agents SDKでは、OpenAIベースクライアントをオーバーライドして、セルフホストモデル用のvLLMを指すことができます。また、Python SDKの場合は、[LiteLLM統合](https://openai.github.io/openai-agents-python/models/litellm/)を使用してvLLMにプロキシすることも可能です。
+Agents SDKでは、OpenAIベースクライアントをオーバーライドして、セルフホスト型モデル用のvLLMを指すように設定できます。また、Python SDKでは、[LiteLLM統合](https://openai.github.io/openai-agents-python/models/litellm/)を使用してvLLMにプロキシすることも可能です。
 
-Python Agents SDKの例を以下に示します：
+以下はPython Agents SDKの例です：
 
 ```
 uv pip install openai-agents
@@ -159,7 +159,7 @@ if __name__ == "__main__":
 
 ## 直接サンプリングでのvLLMの使用
 
-APIサーバーとして`vllm serve`を使用してvLLMを実行する以外に、vLLM Pythonライブラリを使用して推論を直接制御することができます。
+APIサーバーとして`vllm serve`を使用してvLLMを実行する以外に、vLLM Pythonライブラリを使用して推論を直接制御することもできます。
 
 vLLMを直接サンプリングに使用する場合、入力プロンプトが[harmony response format](https://cookbook.openai.com/article/harmony)に従っていることを確認することが重要です。そうでなければモデルが正しく機能しません。これには[`openai-harmony` SDK](https://github.com/openai/harmony)を使用できます。
 
@@ -227,7 +227,7 @@ output_tokens = gen.token_ids  # <-- これらは完了トークンID（プリ�
 # --- 3) 完了トークンIDを構造化されたHarmonyメッセージに解析 ---
 entries = encoding.parse_messages_from_completion_tokens(output_tokens, Role.ASSISTANT)
 
-# 'entries'は構造化された会話エントリ（アシスタントメッセージ、ツール呼び出しなど）のシーケンス
+# 'entries'は構造化された会話エントリのシーケンス（アシスタントメッセージ、ツール呼び出しなど）
 for message in entries:
     print(f"{json.dumps(message.to_dict())}")
 ```
